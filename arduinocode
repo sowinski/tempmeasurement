@@ -5,6 +5,7 @@
 
 #define DHTPIN 2     // what digital pin we're connected to
 
+
 // Uncomment whatever type you're using!
 //#define DHTTYPE DHT11   // DHT 11
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
@@ -22,18 +23,45 @@
 // tweak the timings for faster processors.  This parameter is no longer needed
 // as the current DHT reading algorithm adjusts itself to work on faster procs.
 DHT dht(DHTPIN, DHTTYPE);
+int sensorIn = A0; 
+
 
 void setup() {
   Serial.begin(9600);
   Serial.println("DHTxx test!");
-
+  analogReference(DEFAULT);
   dht.begin();
 }
 
-void loop() {
-  // Wait a few seconds between measurements.
-  delay(2000);
+float read_co2() {
+  int sensorValue = analogRead(sensorIn);
+  float voltage = sensorValue*(5000/1024.0); 
+  //Serial.println(sensorValue);
+  //Serial.println(voltage);
+  if(voltage == 0) {
+   //Serial.println("Fault");
+   return -1;
+  } else if(voltage < 400) { 
+   //Serial.println("preheating");
+   return 0;
+  } else {
+   int voltage_diference=voltage-400;
+   float concentration=voltage_diference*50.0/16.0;
+   // Print Voltage
+   //Serial.print("voltage:");
+   //Serial.print(voltage);
+   //Serial.println("mv");
+   //Print CO2 concentration
+   //Serial.print(concentration);
+   //Serial.println("ppm");
+   return concentration;
+ }
 
+}
+
+void loop() {
+  delay(2000);
+  float co2_ppm = read_co2();
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
@@ -57,6 +85,8 @@ void loop() {
   Serial.print("\", \"");
   Serial.print("heatindex\": \"");
   Serial.print(hic);
+  Serial.print("\", \"co2\": \"");
+  Serial.print(co2_ppm);
   Serial.print("\" }\n");
   
 }
