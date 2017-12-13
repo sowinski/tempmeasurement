@@ -23,6 +23,7 @@ with serial.Serial('/dev/ttyUSB0', 9800, timeout=5) as ser:
 	with open("test.csv", "a") as file:
 		lsthum = []
 		lsttmp = []
+		lstco2 = []
 		lstindextmp = []
 		curmin = strftime("%M", gmtime())
 		while True:
@@ -31,6 +32,7 @@ with serial.Serial('/dev/ttyUSB0', 9800, timeout=5) as ser:
 			if jsonob:
 				lsthum.append(float(jsonob['humidity']))
 				lsttmp.append(float(jsonob['temperature']))
+				lstco2.append(float(jsonob['co2']))
 				lstindextmp.append(float(jsonob['heatindex']))
 				print curmin
 				if curmin != strftime("%M", gmtime()):
@@ -40,13 +42,15 @@ with serial.Serial('/dev/ttyUSB0', 9800, timeout=5) as ser:
 					row = row + unicode(strftime("%H:%M:%S", gmtime()))	+ ";"
 					row = row + unicode(statistics.median(lsthum)) + ";"
 					row = row + unicode(statistics.median(lsttmp)) + ";"
-					row = row + unicode(statistics.median(lstindextmp)) + "\n\r" 			
+					row = row + unicode(statistics.median(lstindextmp)) + ";"	
+					row = row + unicode(statistics.median(lstco2)) + "\n\r" 			
 					print row
 					file.write(row)
 					file.flush()
 					lsthum = []
 					lsttmp = []
 					lstindextmp = []
+					lstco2 = []
 		
 ser.close()
 file.close()
