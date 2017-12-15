@@ -1,3 +1,6 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
 // Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
 
@@ -24,9 +27,11 @@
 // as the current DHT reading algorithm adjusts itself to work on faster procs.
 DHT dht(DHTPIN, DHTTYPE);
 int sensorIn = A0; 
-
+LiquidCrystal_I2C lcd(0x27,20,4); 
 
 void setup() {
+  lcd.init();
+  lcd.backlight();
   Serial.begin(9600);
   Serial.println("DHTxx test!");
   analogReference(DEFAULT);
@@ -88,5 +93,17 @@ void loop() {
   Serial.print("\", \"co2\": \"");
   Serial.print(co2_ppm);
   Serial.print("\" }\n");
+  lcd.setCursor(0,0);
+  lcd.print("Temperatur:");
+  lcd.print(t);
+  lcd.print("C");
+  lcd.setCursor(0,1);
+  lcd.print("Feuchtigkeit:");
+  lcd.print(h);
+  lcd.print("%");
+  lcd.setCursor(0,2);
+  lcd.print("CO2:");
+  lcd.print(co2_ppm);
+  lcd.print("ppm");  
   
 }
